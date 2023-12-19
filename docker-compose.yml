@@ -1,0 +1,79 @@
+#
+# Docker Compose file for Openstad app, i
+# Is working, but not actively recommended for development, the mounts do not work nicely with de frontend app, very heavy and slow
+#
+
+---
+version: '3.1'
+services:
+  mysql:
+    image: "mysql:5"
+    platform: linux/x86_64
+    environment:
+      MYSQL_ROOT_PASSWORD: "insecure"
+      MYSQL_DATABASE: "image"
+      MYSQL_PASSWORD: "insecure"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+
+    expose:
+      - "3306"
+      - "33060"
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    # entrypoint:
+    #   sh -c "
+    #     echo 'CREATE DATABASE IF NOT EXISTS ${AUTH_DB_NAME}; CREATE DATABASE IF NOT EXISTS ${IMAGE_DB_NAME}; CREATE DATABASE IF NOT EXISTS ${API_DATABASE};' > /docker-entrypoint-initdb.d/init.sql;
+    #     /usr/local/bin/docker-entrypoint.sh --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    #   "
+    volumes:
+      - database:/var/lib/mysql
+    networks:
+      - database
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+
+  image:
+    image: ${REGISTRY:-localhost:5001}/${REPOSITORY:-opdrachten/openstad-image}:${VERSION:-latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      DB_NAME: "image"
+      DB_USER: "root"
+      DB_PASSWORD: "insecure"
+      DB_HOST: "mysql"
+      PORT_IMAGE_SERVER: 3000
+      IMAGES_DIR: "/app/images"
+      THROTTLE: true
+      THROTTLE_CC_PROCESSORS: 4
+      THROTTLE_CC_PREFETCHER: 20
+      THROTTLE_CC_REQUESTS: 100
+      APP_URL: "http://localhost/image"
+    expose:
+      - 9999
+    ports:
+      - 9999:9999
+    restart: unless-stopped
+    networks:
+      - database
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+# Volumes section
+# Volumes:
+# - database: A volume that contains everything that is stored in the MySQL database.
+#
+volumes:
+  database:
+
+#
+# Networks section
+# Networks:
+# - database, represents the isolated network between the server and the database.
+networks:
+  database:
+...
