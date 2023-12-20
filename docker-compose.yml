@@ -45,6 +45,7 @@ services:
       DB_USER: "root"
       DB_PASSWORD: "insecure"
       DB_HOST: "mysql"
+      DB_PORT: 3306
       PORT_IMAGE_SERVER: 3000
       IMAGES_DIR: "/app/images"
       THROTTLE: true

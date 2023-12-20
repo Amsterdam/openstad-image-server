@@ -27,6 +27,8 @@ init-db:							## Initiate database
 migrate:                            ## Migrate
 	$(run) image node migrate.js
 
+init: init-db
+
 build:                              ## Build docker image
 	$(dc) build
 
