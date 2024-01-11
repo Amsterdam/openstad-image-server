@@ -1,0 +1,60 @@
+version: '3.1'
+services:
+  mysql:
+    image: "mysql:5"
+    platform: linux/x86_64
+    environment:
+      MYSQL_ROOT_PASSWORD: "insecure"
+      MYSQL_DATABASE: "image"
+      MYSQL_PASSWORD: "insecure"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+
+    expose:
+      - "3306"
+      - "33060"
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    volumes:
+      - database:/var/lib/mysql
+    networks:
+      - database
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+
+  image:
+    image: ${REGISTRY:-localhost:5001}/${REPOSITORY:-opdrachten/openstad-image}:${VERSION:-latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      DB_NAME: "image"
+      DB_USER: "root"
+      DB_PASSWORD: "insecure"
+      DB_HOST: "mysql"
+      DB_PORT: 3306
+      PORT_IMAGE_SERVER: 3000
+      IMAGES_DIR: "/app/images"
+      THROTTLE: true
+      THROTTLE_CC_PROCESSORS: 4
+      THROTTLE_CC_PREFETCHER: 20
+      THROTTLE_CC_REQUESTS: 100
+      APP_URL: "http://localhost/image"
+    expose:
+      - 9999
+    ports:
+      - 9999:9999
+    restart: unless-stopped
+    networks:
+      - database
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  database:
+
+networks:
+  database:

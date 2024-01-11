@@ -12,7 +12,7 @@ COPY --chown=node:node package*.json ./
 RUN   apt-get update \
 &&    apt-get install -y python3 make cmake git bash g++ \
 &&    npm config set unsafe-perm true \
-&&    npm install --no-optional --legacy-peer-deps
+&&    npm install --no-optional
 
 # Release image 
 FROM node:16.16-slim
