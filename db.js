@@ -4,7 +4,7 @@ const { Sequelize } = require('sequelize');
 
 var getAzureAuthToken = require('./azure-auth')
 
-let ssl;
+let ssl = {};
 
 if (process.env.MYSQL_CA_CERT) {
   ssl.ca = process.env.MYSQL_CA_CERT;
