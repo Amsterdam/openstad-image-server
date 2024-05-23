@@ -35,7 +35,7 @@ let sequelize = new Sequelize({
   dialect: process.env.DB_DIALECT || 'mysql',
   dialectOptions: {
     ssl
-  }
+  },
 
  	logging: null,
   // logging: console.log,
