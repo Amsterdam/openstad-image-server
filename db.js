@@ -5,17 +5,15 @@ const { Sequelize } = require('sequelize');
 var getAzureAuthToken = require('./azure-auth')
 
 let ssl;
+
 if (process.env.MYSQL_CA_CERT) {
-  ssl = {
-    ca: process.env.MYSQL_CA_CERT
-  }
+  ssl.ca = process.env.MYSQL_CA_CERT;
 }
 
 if (process.env.AZURE_CLIENT_ID) {
-  ssl = {
-    require: true
-  }
+  ssl.require = true;
 }
+
 
 let sequelize = new Sequelize({
   hooks: {
@@ -34,9 +32,10 @@ let sequelize = new Sequelize({
   username: process.env.DB_USER,
   port:     process.env.DB_PORT || '3306',
 
-  ssl,
-
   dialect: process.env.DB_DIALECT || 'mysql',
+  dialectOptions: {
+    ssl
+  }
 
  	logging: null,
   // logging: console.log,
