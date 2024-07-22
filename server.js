@@ -207,6 +207,11 @@ app.post(
   }
 );
 
+app.get('/:image-id', function (req, res, next) {
+  const imageId = req.params.image-id;
+  res.redirect(`/image/${imageId}`)
+})
+
 app.use(function (err, req, res, next) {
   const status = err.status ? err.status : 500;
   console.error(err);
