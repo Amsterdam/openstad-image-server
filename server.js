@@ -207,6 +207,10 @@ app.post(
   }
 );
 
+app.get('/', function (req, res, next) {
+  res.status(200).send('OK');
+})
+
 app.use(function (err, req, res, next) {
   const status = err.status ? err.status : 500;
   console.error(err);
